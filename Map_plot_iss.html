@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Map Plot</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+  <style type="text/css">
+  	#mapid { height: 370px; width: 800px}
+  	#fle{
+  		display: flex;
+  	}
+  </style>
+</head>
+<body>
+	<div id="f">
+		<div style="float:left;">
+	<h1 style="color: darkgreen">Where is the ISS</h1>
+</div>
+<div style="float: right;padding-left : 80px;padding-right: 120px">
+	<p>
+		lattitude:<span id="lat"></span>
+		<br>
+		longitude:<span id="lon"></span>
+	</p></div>
+	</div>
+	 <div id="mapid"></div>
+	
+
+
+	<script type="text/javascript">
+
+			var myicon = L.icon({
+    iconUrl: 'dot.png',
+   
+
+    iconSize:     [4, 4], // size of the icon
+  
+    iconAnchor:   [2, 2], // point of the icon which will correspond to 
+});
+
+	
+    var mymap = L.map('mapid').setView([0,0], 1);
+    const attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    const tileurl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+
+    const tiles=L.tileLayer(tileurl,{attribution});
+    tiles.addTo(mymap);
+
+
+	async function myfun(){	
+		const responce = await fetch('https://api.wheretheiss.at/v1/satellites/25544')
+		const data=await  responce.json();
+		let lat=data.latitude;
+		let lon=data.longitude;
+		document.getElementById('lat').innerText=lat;
+		document.getElementById('lon').innerText=lon;
+		console.log(lat,lon);
+	//	mymap.setView([lat,lon],2);
+		L.marker(([lat,lon]), {icon: myicon}).addTo(mymap)
+    	.bindPopup(`ISS is at ${lat} and ${lon}`)
+    	.openPopup();
+        
+    }
+    myfun()
+    setInterval(myfun,3000);
+
+	</script>
+</body>
+</html>
